@@ -1,4 +1,4 @@
-# Data exchange schema
+# Overview
 
 XDMoD requires data to be aggregated in four different intervals, day, month, quater and year.  The timezone used for the aggregate periods does matter - typically
 XDMoD install use the local timezone. The ACCESS XDMoD instance uses eastern time zone.
@@ -34,6 +34,7 @@ There is also additional information required for most dimension fields.
 | ------------ | ----------- |
 |  resource     | short and long names, resource specifications (node, core, gpu counts) |
 | resource institution | short, long names, carnegie classification, location (state, country) |
+| field of science | 
 | project | short, long names, project abstract, funding agency award number | 
 | person | first, middle, last names, email address, ORCiD, academic status (undergraduate, postgrad, research staff, etc.) |
 | person institution | short, long names, carnegie classification, location state, location country |
@@ -48,4 +49,15 @@ tell us that they didn't have an ORCiD then it would be "N/A").
 
 XDMoD is designed for long-term historical data analysis and is able to track changes to
 resource sizes over time, changes to a persons academic status and institution over time, etc.
+
+# Data exchange format
+
+XDMoD supports ingestion of data from a wide variety of sources including relational
+databases (MySQL, PostgreSQL), object databases (MongoDB), REST interfaces, and files in a variety
+formats JSON, csv, XML, etc.
+
+For file-based ingestion, the JSON data-interchange format is preferred for files because of its wide support and well-defined
+data encoding mechanism.
+
+
 
