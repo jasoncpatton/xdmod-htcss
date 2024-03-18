@@ -20,7 +20,7 @@ The fields required are listed below:
 | processor_count | The number of CPUs a job was allocated |
 | gpu_count  | The number of GPUs a job was allocated |
 | wallduration  | The wallduration of the jobs that were running during this period in seconds. This should only count the walltime of the jobs that ran during this day. A job that runs for multiple days will have its walltime assigned to each day. For example, a job that runs from March 14 6:00PM to March 15 8:00AM will have 6 hours on March 14th and 8 hours on March 15th
-| waitduration  | The amount of time jobs waited to execute during this day, in seconds |
+| waitduration  | The sum of all wait times for jobs started during the time period, in seconds. Where the wait time is the difference in time between sumbit and start.|
 | submitted_job_count | The number of jobs that were submitted in this time period |
 | ended_job_count | The number of jobs that completed execution in this time period |
 | started_job_count | The number of jobs that started execution in this time period |
