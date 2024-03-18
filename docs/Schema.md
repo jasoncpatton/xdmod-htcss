@@ -8,8 +8,7 @@ The fields required are listed below:
 
 | Field Short Name   | Description |
 | ------------ | ----------- |
-| date         | date for data in this record in YYYY-MM-DD format. For month, quater and year this would be the date of the first day in the period. For example 2024-04-01 for the second quater of 2024. All aggregate data in an XDMoD database must use
-the same timezone (typically the local timezone). The ACCESS XDMoD instance uses Eastern Time. | 
+| date         | date for data in this record in YYYY-MM-DD format. For month, quater and year this would be the date of the first day in the period. For example 2024-04-01 for the second quater of 2024. All aggregate data in an XDMoD database must use the same timezone (typically the local timezone). The ACCESS XDMoD instance uses Eastern Time. | 
 | resource     | The identifier of the compute resource where the jobs ran | 
 | resource institution | The identifier of the institution or facility where the jobs ran |
 | system account  | The username the jobs ran under. Usernames are not expected to be globally unique but must be unique for a given resource |
