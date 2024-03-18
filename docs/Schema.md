@@ -1,7 +1,7 @@
 # Overview
 
-XDMoD requires data to be aggregated in four different intervals, day, month, quater and year.  The timezone used for the aggregate periods does matter - typically
-XDMoD install use the local timezone. The ACCESS XDMoD instance uses eastern time zone.
+XDMoD requires data to be aggregated in four different intervals, day, month, quater and year.  All aggregate data must use
+the same timezone (typically the local timezone). The ACCESS XDMoD instance uses Eastern Time.
 
 The fields required are listed below:
 
