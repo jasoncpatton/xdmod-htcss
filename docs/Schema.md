@@ -35,8 +35,8 @@ There is also additional information required for most dimension fields.
 |  resource     | short and long names, resource specifications (node, core, gpu counts) |
 | resource institution | short, long names, carnegie classification, location (state, country) |
 | project | short, long names, project abstract, funding agency award number | 
-| person | first, middle, last names, email address, ORCiD |
-| person institution | short, long names, carnegie classification, location (state, country) |
+| person | first, middle, last names, email address, ORCiD, academic status (undergraduate, postgrad, research staff, etc.) |
+| person institution | short, long names, carnegie classification, location state, location country |
 | project lead/PI | _same as person_ | 
 | project lead/PI institution | _same as person instituion_ |
 
@@ -45,3 +45,7 @@ meaning that the value was not reported. For example, government labs do not hav
 so the institution record for a Gov lab would have "N/A" in the Carnegie classification field.
 If a user did not tell us their ORCiD then the field would be "Unknown" (if they did
 tell us that they didn't have an ORCiD then it would be "N/A").
+
+XDMoD is designed for long-term historical data analysis and is able to track changes to
+resource sizes over time, changes to a persons academic status and institution over time, etc.
+
