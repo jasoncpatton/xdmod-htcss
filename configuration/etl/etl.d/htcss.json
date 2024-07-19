@@ -1,0 +1,259 @@
+{
+    "module": "htcss",
+    "defaults": {
+
+        "global": {
+            "endpoints": {
+                "source": {
+                    "type": "mysql",
+                    "name": "Datawarehouse",
+                    "config": "datawarehouse",
+                    "schema": "modw_htcss",
+                    "create_schema_if_not_exists": true
+                },
+                "destination": {
+                    "type": "mysql",
+                    "name": "datawarehouse",
+                    "config": "datawarehouse",
+                    "schema": "modw_htcss",
+                    "create_schema_if_not_exists": true
+                }
+            }
+        },
+        "htcss-ingest": {
+            "namespace": "ETL\\Ingestor",
+            "options_class": "IngestorOptions",
+            "class": "DatabaseIngestor"
+        },
+        "htcss-aggregate": {
+            "namespace": "ETL\\Ingestor",
+            "options_class": "IngestorOptions",
+            "class": "DatabaseIngestor"
+        }
+    },
+    "htcss-ingest": [{
+              "name": "HtcssRawLogsIngest",
+              "description": "Summarized data from HTCondor",
+              "class": "StructuredFileIngestor",
+              "definition_file": "htcss/staging.json",
+              "stop_on_exception": true,
+              "truncate_destination": true,
+              "endpoints": {
+                  "source": {
+                      "type": "directoryscanner",
+                      "name": "HTCSS logs",
+                      "#": "Relative paths are searched in $BASEDIR/etl_data.d",
+                      "path": "${HTCSS_LOG_DIR}",
+                      "file_pattern": "/[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}_[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.json/",
+                      "#": "Recursion depth is relative to the path",
+                      "recursion_depth": 1,
+                      "handler": {
+                          "type": "jsonfile",
+                          "record_separator": "\n",
+                          "record_schema_path": "htcss/record.schema.json",
+                          "#": "Explicitly specify field names as some are optional",
+                          "field_names": [
+                              "resource",
+                              "project",
+                              "system_account",
+                              "processor_count",
+                              "gpu_count",
+                              "wallduration",
+                              "running_job_count",
+                              "waitduration",
+                              "submitted_job_count",
+                              "ended_job_count",
+                              "started_job_count",
+                              "date",
+                              "resource_institution",
+                              "field_of_science",
+                              "project_pi",
+                              "project_pi_institution",
+                              "person",
+                              "person_institution"
+                          ],
+                          "filters": [{
+                            "#": "Open Stack records do not contain a record_type field so we determine it by looking at the",
+                            "#": "event type of a record.",
+                            "type": "external",
+                            "name": "jq",
+                            "path": "jq",
+                            "arguments" :"-c '.[]'"
+                          }]
+                      }
+                  }
+              }
+      },
+      {
+          "name": "set-start-and-end-date",
+          "description": "Set start and end date ID for each record",
+          "namespace": "ETL\\Maintenance",
+          "options_class": "MaintenanceOptions",
+          "class": "ExecuteSql",
+          "sql_file_list": [
+              "htcss/update-start-end-time.sql"
+          ]
+      },
+      {
+          "name": "pi-resource",
+          "description": "Ingest job PI/Resource permutations",
+          "definition_file": "htcss/pi-resource.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "pi",
+          "description": "Ingest job PIs",
+          "definition_file": "htcss/pi.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "queue",
+          "description": "Ingest queue information",
+          "definition_file": "htcss/queue.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "modw",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "pi-organization",
+          "description": "Ingest PI organizations",
+          "definition_file": "htcss/pi-organization.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "person-organization",
+          "description": "Ingest organization of the person who is running jobs",
+          "definition_file": "htcss/person-organization.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "resource-organization",
+          "description": "Ingest organization of the resource",
+          "definition_file": "htcss/resource-organization.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "union-user-pi--pi",
+          "description": "Ingest job PIs (combined with users)",
+          "definition_file": "htcss/union-user-pi--pi.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "union-user-pi--user",
+          "description": "Ingest job users (combined with PIs)",
+          "definition_file": "htcss/union-user-pi--user.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "union-user-pi-resource--pi",
+          "description": "Ingest job PI/Resource permutations (combined with User/Resource permutations)",
+          "definition_file": "htcss/union-user-pi-resource--pi.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      },
+      {
+          "name": "union-user-pi-resource--user",
+          "description": "Ingest job User/Resource permutations (combined with PI/Resource permutations)",
+          "definition_file": "htcss/union-user-pi-resource--user.json",
+          "endpoints":{
+              "destination": {
+                "type" : "mysql",
+                "name" : "hpcdb DB",
+                "config" : "datawarehouse",
+                "schema": "mod_shredder",
+                "create_schema_if_not_exists": true
+              }
+          }
+      }
+    ],
+    "htcss-aggregate": [
+        {
+            "name": "ingest-day",
+            "description": "Ingest daily data",
+            "definition_file": "htcss/aggregate-daily.json",
+            "namespace": "ETL\\Aggregator",
+            "options_class": "AggregatorOptions",
+            "class": "SimpleAggregator",
+            "table_prefix": "jobfact_by_",
+            "aggregation_units": ["day"],
+            "endpoints": {
+                "destination": {
+                  "type" : "mysql",
+                  "name" : "hpcdb DB",
+                  "config" : "datawarehouse",
+                  "schema": "modw_aggregates",
+                  "create_schema_if_not_exists": true
+                }
+            }
+        }
+    ]
+}

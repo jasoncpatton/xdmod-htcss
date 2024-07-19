@@ -1,0 +1,35 @@
+{
+    "table_definition": {
+        "$ref": "${table_definition_dir}/jobs/xdw/queue.json#/table_definition"
+    },
+    "source_query": {
+        "records": {
+            "id": "DISTINCT COALESCE(raw.queue, 'NA')",
+            "resource_id": "rf.name",
+            "queue_origin_id": "COALESCE(raw.queue, 'NA')"
+        },
+        "joins": [
+            {
+                "name": "htcss_raw_logs",
+                "schema": "${SOURCE_SCHEMA}",
+                "alias": "raw"
+            },
+            {
+                "name": "queue",
+                "schema": "${DESTINATION_SCHEMA}",
+                "alias": "q",
+                "type": "LEFT",
+                "on": "q.id = raw.queue"
+            },
+            {
+                "name": "resourcefact",
+                "schema": "${DESTINATION_SCHEMA}",
+                "alias": "rf",
+                "on": "raw.resource = rf.name"
+            }
+        ],
+        "where": [
+          "raw.queue IS NULL"
+        ]
+    }
+}

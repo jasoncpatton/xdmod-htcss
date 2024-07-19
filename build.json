@@ -1,0 +1,33 @@
+{
+    "name": "xdmod-htcss",
+    "version": "11.0.0",
+    "release": "1.0",
+    "files": {
+        "include_paths": [
+        ],
+        "include_patterns": [
+        ],
+        "exclude_paths": [
+        ],
+        "exclude_patterns": [
+            "#/\\.#",
+            "#/docs#",
+            "#/tests#"
+        ]
+    },
+    "file_maps": {
+        "data": [
+            "classes"
+        ],
+        "bin": [
+            "bin/"
+        ],
+        "doc": [
+            "LICENSE"
+        ],
+        "etc": {
+            "configuration/etl": "",
+            "configuration/datawarehouse.d": ""
+        }
+    }
+}
