@@ -1,11 +1,9 @@
 {
-    "table_definition": [
-        {
-            "$ref": "${table_definition_dir}/htcss/htcss_raw_logs.json#/table_definition"
-        }
-    ],
-    "destination_record_map": {
-        "htcss_raw_logs": {
+    "table_definition": {
+        "$ref": "${table_definition_dir}/htcss/htcss_raw_logs_${AGGREGATION_UNIT}.json#/table_definition"
+    },
+    "source_query": {
+        "records": {
             "start_date": "start_date",
             "end_date": "end_date",
             "resource": "resource",
@@ -29,6 +27,16 @@
             "project_pi_institution": "project_pi_institution",
             "person": "person",
             "person_institution": "person_institution"
-        }
+        },
+        "joins": [
+            {
+                "name": "htcss_raw_logs",
+                "schema": "${SOURCE_SCHEMA}",
+                "alias": "raw"
+            }
+        ],
+        "where": [
+            "raw.aggregation_unit = \"${AGGREGATION_UNIT}\""
+        ]
     }
 }

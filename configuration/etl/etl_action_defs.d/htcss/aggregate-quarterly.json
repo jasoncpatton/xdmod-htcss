@@ -4,8 +4,8 @@
     },
     "aggregation_period_query": {
         "overseer_restrictions": {
-            "last_modified_start_date": "start_date >= (SELECT MIN(start_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'day')",
-            "last_modified_end_date": "end_date <= (SELECT MAX(end_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'day')"
+            "last_modified_start_date": "start_date >= (SELECT MIN(start_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'quarter')",
+            "last_modified_end_date": "end_date <= (SELECT MAX(end_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'quarter')"
         }
     },
     "source_query": {
@@ -56,8 +56,7 @@
             "node_time": "0",
             "sum_node_time_squared": "0",
             "sum_weighted_expansion_factor": "0",
-            "sum_job_weights": "0",
-            "job_id_list": "0"
+            "sum_job_weights": "0"
         },
         "joins": [
             {

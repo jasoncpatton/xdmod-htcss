@@ -1,6 +1,6 @@
 {
     "name": "xdmod-htcss",
-    "version": "11.0.0",
+    "version": "10.5.0",
     "release": "1.0",
     "files": {
         "include_paths": [
@@ -26,8 +26,7 @@
             "LICENSE"
         ],
         "etc": {
-            "configuration/etl": "",
-            "configuration/datawarehouse.d": ""
+            "configuration/": ""
         }
     }
 }

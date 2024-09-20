@@ -53,8 +53,13 @@
                           "record_schema_path": "htcss/record.schema.json",
                           "#": "Explicitly specify field names as some are optional",
                           "field_names": [
+                              "start_date",
+                              "end_date",
                               "resource",
                               "project",
+                              "job_wall_time_bucket",
+                              "job_wait_time_bucket",
+                              "aggregation_unit",
                               "system_account",
                               "processor_count",
                               "gpu_count",
@@ -85,16 +90,6 @@
               }
       },
       {
-          "name": "set-start-and-end-date",
-          "description": "Set start and end date ID for each record",
-          "namespace": "ETL\\Maintenance",
-          "options_class": "MaintenanceOptions",
-          "class": "ExecuteSql",
-          "sql_file_list": [
-              "htcss/update-start-end-time.sql"
-          ]
-      },
-      {
           "name": "pi-resource",
           "description": "Ingest job PI/Resource permutations",
           "definition_file": "htcss/pi-resource.json",
@@ -118,20 +113,6 @@
                 "name" : "hpcdb DB",
                 "config" : "datawarehouse",
                 "schema": "mod_shredder",
-                "create_schema_if_not_exists": true
-              }
-          }
-      },
-      {
-          "name": "queue",
-          "description": "Ingest queue information",
-          "definition_file": "htcss/queue.json",
-          "endpoints":{
-              "destination": {
-                "type" : "mysql",
-                "name" : "hpcdb DB",
-                "config" : "datawarehouse",
-                "schema": "modw",
                 "create_schema_if_not_exists": true
               }
           }
@@ -233,18 +214,85 @@
                 "create_schema_if_not_exists": true
               }
           }
+      },
+      {
+          "name": "set-start-and-end-date",
+          "description": "Set start and end date ID for each record",
+          "namespace": "ETL\\Maintenance",
+          "options_class": "MaintenanceOptions",
+          "class": "ExecuteSql",
+          "sql_file_list": [
+              "htcss/update-start-end-time.sql"
+          ]
       }
     ],
     "htcss-aggregate": [
         {
             "name": "ingest-day",
-            "description": "Ingest daily data",
+            "description": "Aggregate daily data",
             "definition_file": "htcss/aggregate-daily.json",
             "namespace": "ETL\\Aggregator",
             "options_class": "AggregatorOptions",
             "class": "SimpleAggregator",
             "table_prefix": "jobfact_by_",
             "aggregation_units": ["day"],
+            "endpoints": {
+                "destination": {
+                  "type" : "mysql",
+                  "name" : "hpcdb DB",
+                  "config" : "datawarehouse",
+                  "schema": "modw_aggregates",
+                  "create_schema_if_not_exists": true
+                }
+            }
+        },
+        {
+            "name": "ingest-month",
+            "description": "Aggregate monthly data",
+            "definition_file": "htcss/aggregate-monthly.json",
+            "namespace": "ETL\\Aggregator",
+            "options_class": "AggregatorOptions",
+            "class": "SimpleAggregator",
+            "table_prefix": "jobfact_by_",
+            "aggregation_units": ["month"],
+            "endpoints": {
+                "destination": {
+                  "type" : "mysql",
+                  "name" : "hpcdb DB",
+                  "config" : "datawarehouse",
+                  "schema": "modw_aggregates",
+                  "create_schema_if_not_exists": true
+                }
+            }
+        },
+        {
+            "name": "aggregate-quarter",
+            "description": "Aggregate quarterly data",
+            "definition_file": "htcss/aggregate-quarterly.json",
+            "namespace": "ETL\\Aggregator",
+            "options_class": "AggregatorOptions",
+            "class": "SimpleAggregator",
+            "table_prefix": "jobfact_by_",
+            "aggregation_units": ["quarter"],
+            "endpoints": {
+                "destination": {
+                  "type" : "mysql",
+                  "name" : "hpcdb DB",
+                  "config" : "datawarehouse",
+                  "schema": "modw_aggregates",
+                  "create_schema_if_not_exists": true
+                }
+            }
+        },
+        {
+            "name": "aggregate-year",
+            "description": "Aggregate yearly data",
+            "definition_file": "htcss/aggregate-yearly.json",
+            "namespace": "ETL\\Aggregator",
+            "options_class": "AggregatorOptions",
+            "class": "SimpleAggregator",
+            "table_prefix": "jobfact_by_",
+            "aggregation_units": ["year"],
             "endpoints": {
                 "destination": {
                   "type" : "mysql",

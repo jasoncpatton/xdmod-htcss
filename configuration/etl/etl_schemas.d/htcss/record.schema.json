@@ -14,6 +14,15 @@
         "system_account": {
             "type": "string"
         },
+        "job_wall_time_bucket": {
+            "type": "integer"
+        },
+        "job_wait_time_bucket": {
+            "type": "integer"
+        },
+        "aggregation_unit": {
+            "type": "string"
+        },
         "processor_count": {
             "type": "integer"
         },

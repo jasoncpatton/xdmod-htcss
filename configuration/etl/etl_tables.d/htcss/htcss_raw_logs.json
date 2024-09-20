@@ -8,13 +8,36 @@
                 "name": "start_date",
                 "type": "date",
                 "default": "0000-00-00",
-                "nullable": false
+                "nullable": true
             },
             {
                 "name": "end_date",
                 "type": "date",
                 "default": "0000-00-00",
+                "nullable": true
+            },
+            {
+                "name": "aggregation_unit",
+                "type": "varchar(32)",
                 "nullable": false
+            },
+            {
+                "name": "aggregation_unit_id",
+                "type": "int(11)",
+                "nullable": true,
+                "default": null
+            },
+            {
+                "name": "job_wait_time_bucket",
+                "type": "int(4)",
+                "nullable": true,
+                "default": -1
+            },
+            {
+                "name": "job_wall_time_bucket",
+                "type": "int(4)",
+                "nullable": true,
+                "default": -1
             },
             {
                 "name": "start_day_id",
@@ -31,8 +54,8 @@
             {
                 "name": "record_id",
                 "type": "int(11)",
-                "extra": "auto_increment",
-                "nullable": false
+                "nullable": false,
+                "extra": "auto_increment"
             },
             {
                 "name": "resource",
@@ -42,7 +65,8 @@
             {
                 "name": "queue",
                 "type": "varchar(256)",
-                "nullable": false
+                "nullable": false,
+                "default": -1
             },
             {
                 "name": "project",
@@ -98,7 +122,8 @@
             {
                 "name": "date",
                 "type": "varchar(256)",
-                "nullable": false
+                "default": "0000-00-00",
+                "nullable": true
             },
             {
                 "name": "resource_institution",
@@ -116,6 +141,12 @@
                 "nullable": false
             },
             {
+                "name": "project_pi_person_id",
+                "type": "varchar(256)",
+                "nullable": false,
+                "default": -1
+            },
+            {
                 "name": "project_pi_institution",
                 "type": "varchar(256)",
                 "nullable": false
@@ -126,9 +157,22 @@
                 "nullable": false
             },
             {
+                "name": "person_id",
+                "type": "int(11)",
+                "nullable": false,
+                "default": -1
+            },
+            {
                 "name": "person_institution",
                 "type": "varchar(256)",
                 "nullable": false
+            },
+            {
+                "name": "last_modified",
+                "type": "timestamp",
+                "nullable": false,
+                "default": "CURRENT_TIMESTAMP",
+                "extra": "on update CURRENT_TIMESTAMP"
             }
         ],
         "indexes": [
@@ -136,6 +180,41 @@
                 "name": "PRIMARY",
                 "columns": [
                     "record_id"
+                ],
+                "is_unique": true
+            },
+            {
+                "name": "aggregation_unit_idx",
+                "columns": ["aggregation_unit_id"],
+                "is_unique": false
+            },
+            {
+                "name": "aggregation_time_idx",
+                "columns": ["start_day_id", "end_day_id"],
+                "is_unique": false
+            },
+            {
+                "name": "index_last_modified",
+                "columns": ["last_modified"]
+            },
+            {
+                "name": "unique_idx",
+                "columns": [
+                    "start_date",
+                    "end_date",
+                    "resource",
+                    "resource_institution",
+                    "system_account",
+                    "field_of_science",
+                    "project",
+                    "project_pi",
+                    "project_pi_institution",
+                    "person",
+                    "person_institution",
+                    "processor_count",
+                    "gpu_count",
+                    "job_wait_time_bucket",
+                    "job_wall_time_bucket"
                 ],
                 "is_unique": true
             }
