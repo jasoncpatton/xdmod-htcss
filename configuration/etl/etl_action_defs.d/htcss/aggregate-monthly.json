@@ -4,8 +4,8 @@
     },
     "aggregation_period_query": {
         "overseer_restrictions": {
-            "last_modified_start_date": "start_date >= (SELECT MIN(start_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'month')",
-            "last_modified_end_date": "end_date <= (SELECT MAX(end_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit = 'month')"
+            "last_modified_start_date": "start_date >= (SELECT MIN(start_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit_id = 2)",
+            "last_modified_end_date": "end_date <= (SELECT MAX(end_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit_id = 2)"
         }
     },
     "source_query": {
@@ -39,6 +39,7 @@
             "gpu_count": "raw.gpu_count",
             "gpubucket_id": "(SELECT id FROM ${UTILITY_SCHEMA}.gpu_buckets gb WHERE raw.gpu_count BETWEEN gb.min_gpus AND gb.max_gpus)",
             "qos_id": "-1",
+            "queue": "\"NA\"",
             "submitted_job_count": "raw.submitted_job_count",
             "ended_job_count": "raw.ended_job_count",
             "started_job_count": "raw.started_job_count",
@@ -122,7 +123,7 @@
             }
         ],
         "where": [
-            "raw.aggregation_unit = \"${AGGREGATION_UNIT}\"",
+            "raw.aggregation_unit_id = 2",
             "raw.start_day_id <= ${:PERIOD_END_DAY_ID} AND raw.end_day_id >= ${:PERIOD_START_DAY_ID}"
         ]
     }

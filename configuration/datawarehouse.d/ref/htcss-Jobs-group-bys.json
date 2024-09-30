@@ -69,42 +69,6 @@
       "quarter": {
           "$ref": "datawarehouse.d/ref/group-by-time-period.json#/quarter"
       },
-      "resource": {
-        "attribute_table_schema": "modw",
-        "attribute_to_aggregate_table_key_map": [
-            {
-                "id": "record_resource_id"
-            }
-        ],
-        "attribute_values_query": {
-            "joins": [
-                {
-                    "name": "resourcefact"
-                },
-                {
-                    "name": "resourcespecs",
-                    "on": "resourcefact.id = resourcespecs.resource_id"
-                }
-            ],
-            "orderby": [
-                "resourcefact.code",
-                "resourcefact.name"
-            ],
-            "query_hint": "DISTINCT",
-            "records": {
-                "id": "resourcefact.id",
-                "name": "REPLACE(resourcefact.name, '-', ' ')",
-                "order_id": "id",
-                "short_name": "REPLACE(resourcefact.name, '-', ' ')"
-            },
-            "where": [
-                "resourcespecs.cpu_processor_count IS NOT NULL"
-            ]
-        },
-        "category": "Administrative",
-        "description_html": "A resource is a remote computer that can run jobs.",
-        "name": "Resource"
-      },
       "resource_type": {
           "$ref": "datawarehouse.d/ref/group-by-common.json#/resource_type"
       },

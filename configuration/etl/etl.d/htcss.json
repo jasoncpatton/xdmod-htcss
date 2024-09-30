@@ -69,7 +69,6 @@
                               "submitted_job_count",
                               "ended_job_count",
                               "started_job_count",
-                              "date",
                               "resource_institution",
                               "field_of_science",
                               "project_pi",
@@ -217,12 +216,12 @@
       },
       {
           "name": "set-start-and-end-date",
-          "description": "Set start and end date ID for each record",
+          "description": "Update ingested records to include person and pi ID",
           "namespace": "ETL\\Maintenance",
           "options_class": "MaintenanceOptions",
           "class": "ExecuteSql",
           "sql_file_list": [
-              "htcss/update-start-end-time.sql"
+              "htcss/post-ingest-update.sql"
           ]
       }
     ],

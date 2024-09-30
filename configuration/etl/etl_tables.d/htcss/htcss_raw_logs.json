@@ -63,12 +63,6 @@
                 "nullable": false
             },
             {
-                "name": "queue",
-                "type": "varchar(256)",
-                "nullable": false,
-                "default": -1
-            },
-            {
                 "name": "project",
                 "type": "varchar(256)",
                 "nullable": false
@@ -117,12 +111,6 @@
             {
                 "name": "started_job_count",
                 "type": "int(11)",
-                "nullable": true
-            },
-            {
-                "name": "date",
-                "type": "varchar(256)",
-                "default": "0000-00-00",
                 "nullable": true
             },
             {
