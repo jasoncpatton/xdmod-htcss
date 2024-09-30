@@ -1,0 +1,32 @@
+{
+    "name": "xdmod-htcss",
+    "version": "10.5.0",
+    "release": "rc.1",
+    "files": {
+        "include_paths": [
+        ],
+        "include_patterns": [
+        ],
+        "exclude_paths": [
+        ],
+        "exclude_patterns": [
+            "#/\\.#",
+            "#/docs#",
+            "#/tests#"
+        ]
+    },
+    "file_maps": {
+        "data": [
+            "classes"
+        ],
+        "bin": [
+            "bin/"
+        ],
+        "doc": [
+            "LICENSE"
+        ],
+        "etc": {
+            "configuration/": ""
+        }
+    }
+}

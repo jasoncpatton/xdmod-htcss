@@ -1,0 +1,211 @@
+{
+    "table_definition": {
+        "name": "htcss_raw_logs",
+        "engine": "InnoDB",
+        "comment": "Summarized HTCondor Jobs",
+        "columns": [
+            {
+                "name": "start_date",
+                "type": "date",
+                "default": "0000-00-00",
+                "nullable": true
+            },
+            {
+                "name": "end_date",
+                "type": "date",
+                "default": "0000-00-00",
+                "nullable": true
+            },
+            {
+                "name": "aggregation_unit",
+                "type": "varchar(32)",
+                "nullable": false
+            },
+            {
+                "name": "aggregation_unit_id",
+                "type": "int(11)",
+                "nullable": true,
+                "default": null
+            },
+            {
+                "name": "job_wait_time_bucket",
+                "type": "int(4)",
+                "nullable": true,
+                "default": -1
+            },
+            {
+                "name": "job_wall_time_bucket",
+                "type": "int(4)",
+                "nullable": true,
+                "default": -1
+            },
+            {
+                "name": "start_day_id",
+                "type": "int(11)",
+                "default": -1,
+                "nullable": true
+            },
+            {
+                "name": "end_day_id",
+                "type": "int(11)",
+                "default": -1,
+                "nullable": true
+            },
+            {
+                "name": "record_id",
+                "type": "int(11)",
+                "nullable": false,
+                "extra": "auto_increment"
+            },
+            {
+                "name": "resource",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "project",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "system_account",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "processor_count",
+                "type": "int(11)",
+                "nullable": true,
+                "comment": "Instance identifier from cloud provider"
+            },
+            {
+                "name": "gpu_count",
+                "type": "int(11)",
+                "nullable": true
+            },
+            {
+                "name": "wallduration",
+                "type": "decimal(16,4)",
+                "nullable": true
+            },
+            {
+                "name": "running_job_count",
+                "type": "int(11)",
+                "nullable": true
+            },
+            {
+                "name": "waitduration",
+                "type": "decimal(16,4)",
+                "nullable": true
+            },
+            {
+                "name": "submitted_job_count",
+                "type": "int(11)",
+                "nullable": true
+            },
+            {
+                "name": "ended_job_count",
+                "type": "int(11)",
+                "nullable": true
+            },
+            {
+                "name": "started_job_count",
+                "type": "int(11)",
+                "nullable": true
+            },
+            {
+                "name": "resource_institution",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "field_of_science",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "project_pi",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "project_pi_person_id",
+                "type": "varchar(256)",
+                "nullable": false,
+                "default": -1
+            },
+            {
+                "name": "project_pi_institution",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "person",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "person_id",
+                "type": "int(11)",
+                "nullable": false,
+                "default": -1
+            },
+            {
+                "name": "person_institution",
+                "type": "varchar(256)",
+                "nullable": false
+            },
+            {
+                "name": "last_modified",
+                "type": "timestamp",
+                "nullable": false,
+                "default": "CURRENT_TIMESTAMP",
+                "extra": "on update CURRENT_TIMESTAMP"
+            }
+        ],
+        "indexes": [
+            {
+                "name": "PRIMARY",
+                "columns": [
+                    "record_id"
+                ],
+                "is_unique": true
+            },
+            {
+                "name": "aggregation_unit_idx",
+                "columns": ["aggregation_unit_id"],
+                "is_unique": false
+            },
+            {
+                "name": "aggregation_time_idx",
+                "columns": ["start_day_id", "end_day_id"],
+                "is_unique": false
+            },
+            {
+                "name": "index_last_modified",
+                "columns": ["last_modified"]
+            },
+            {
+                "name": "unique_idx",
+                "columns": [
+                    "start_date",
+                    "end_date",
+                    "resource",
+                    "resource_institution",
+                    "system_account",
+                    "field_of_science",
+                    "project",
+                    "project_pi",
+                    "project_pi_institution",
+                    "person",
+                    "person_institution",
+                    "processor_count",
+                    "gpu_count",
+                    "job_wait_time_bucket",
+                    "job_wall_time_bucket"
+                ],
+                "is_unique": true
+            }
+        ]
+    }
+}

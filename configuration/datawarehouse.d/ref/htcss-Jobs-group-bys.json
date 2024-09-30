@@ -1,0 +1,150 @@
+{
+      "day": {
+          "$ref": "datawarehouse.d/ref/group-by-time-period.json#/day"
+      },
+      "fieldofscience": {
+          "$ref": "datawarehouse.d/ref/group-by-hierarchy.json#/fieldofscience"
+      },
+      "jobsize": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/jobsize"
+      },
+      "gpucount": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/gpucount"
+      },
+      "jobwaittime": {
+          "attribute_table_schema": "modw",
+          "attribute_to_aggregate_table_key_map": [
+              {
+                  "id": "job_wait_time_bucket_id"
+              }
+          ],
+          "attribute_values_query": {
+              "joins": [
+                  {
+                      "name": "job_wait_times"
+                  }
+              ],
+              "orderby": [
+                  "id"
+              ],
+              "records": {
+                  "id": "id",
+                  "name": "description",
+                  "order_id": "id",
+                  "short_name": "description"
+              }
+          },
+          "category": "Administrative",
+          "chart_options": {
+              "dataset_display_type": {
+                  "aggregate": "bar",
+                  "timeseries": "area"
+              }
+          },
+          "data_sort_order": null,
+          "description_html": "A categorization of jobs into discrete groups based on the total linear time each job waited.",
+          "name": "Job Wait Time"
+      },
+      "jobwalltime": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/jobwalltime"
+      },
+      "month": {
+          "$ref": "datawarehouse.d/ref/group-by-time-period.json#/month"
+      },
+      "none": {
+          "$ref": "datawarehouse.d/ref/group-by-none.json"
+      },
+      "nsfdirectorate": {
+          "$ref": "datawarehouse.d/ref/group-by-hierarchy.json#/nsfdirectorate"
+      },
+      "parentscience": {
+          "$ref": "datawarehouse.d/ref/group-by-hierarchy.json#/parentscience"
+      },
+      "person": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/person"
+      },
+      "pi": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/pi"
+      },
+      "quarter": {
+          "$ref": "datawarehouse.d/ref/group-by-time-period.json#/quarter"
+      },
+      "resource_type": {
+          "$ref": "datawarehouse.d/ref/group-by-common.json#/resource_type"
+      },
+      "year": {
+          "$ref": "datawarehouse.d/ref/group-by-time-period.json#/year"
+      },
+    "institution": {
+        "attribute_table": "organization",
+        "attribute_table_schema": "modw",
+        "attribute_to_aggregate_table_key_map": [{
+            "id": "person_organization_id"
+        }],
+        "attribute_values_query": {
+            "joins": [{
+                "name": "organization"
+            }],
+            "orderby": [
+                "id"
+            ],
+            "records": {
+                "id": "id",
+                "name": "long_name",
+                "order_id": "id",
+                "short_name": "short_name"
+            }
+        },
+        "category": "Administrative",
+        "description_html": "Organizations that have users with allocations.",
+        "name": "User Institution"
+    },
+    "resource_institution": {
+        "attribute_table": "organization",
+        "attribute_table_schema": "modw",
+        "attribute_to_aggregate_table_key_map": [{
+            "id": "resource_organization_id"
+        }],
+        "attribute_values_query": {
+            "joins": [{
+                "name": "organization"
+            }],
+            "orderby": [
+                "id"
+            ],
+            "records": {
+                "id": "id",
+                "name": "long_name",
+                "order_id": "id",
+                "short_name": "short_name"
+            }
+        },
+        "category": "Administrative",
+        "description_html": "Organizations that provide resources.",
+        "name": "Resource Institution"
+    },
+    "pi_institution": {
+        "attribute_table": "organization",
+        "attribute_table_schema": "modw",
+        "attribute_to_aggregate_table_key_map": [{
+            "id": "piperson_organization_id"
+        }],
+        "attribute_values_query": {
+            "joins": [{
+                "name": "organization"
+            }],
+            "orderby": [
+                "id"
+            ],
+            "records": {
+                "id": "id",
+                "name": "long_name",
+                "order_id": "id",
+                "short_name": "short_name"
+            }
+        },
+        "category": "Administrative",
+        "description_html": "Organizations that have PIs with allocations.",
+        "name": "PI Institution"
+    }
+}

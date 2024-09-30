@@ -1,0 +1,33 @@
+{
+    "table_definition": [
+        {
+            "$ref": "${table_definition_dir}/htcss/htcss_raw_logs.json#/table_definition"
+        }
+    ],
+    "destination_record_map": {
+        "htcss_raw_logs": {
+            "start_date": "start_date",
+            "end_date": "end_date",
+            "resource": "resource",
+            "aggregation_unit": "aggregation_unit",
+            "project": "project",
+            "system_account": "system_account",
+            "processor_count": "processor_count",
+            "gpu_count": "gpu_count",
+            "wallduration": "wallduration",
+            "running_job_count": "running_job_count",
+            "waitduration": "waitduration",
+            "job_wall_time_bucket": "job_wall_time_bucket",
+            "job_wait_time_bucket": "job_wait_time_bucket",
+            "submitted_job_count": "submitted_job_count",
+            "ended_job_count": "ended_job_count",
+            "started_job_count": "started_job_count",            
+            "resource_institution": "resource_institution",
+            "field_of_science": "field_of_science",
+            "project_pi": "project_pi",
+            "project_pi_institution": "project_pi_institution",
+            "person": "person",
+            "person_institution": "person_institution"
+        }
+    }
+}
