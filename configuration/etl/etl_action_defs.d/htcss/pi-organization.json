@@ -1,0 +1,28 @@
+{
+    "table_definition": {
+        "$ref": "${table_definition_dir}/common/staging/organization.json"
+    },
+    "source_query": {
+        "records": {
+            "organization_name": "DISTINCT raw.project_pi_institution",
+            "organization_abbrev": "raw.project_pi_institution"
+        },
+        "joins": [
+            {
+                "name": "htcss_raw_logs",
+                "schema": "${SOURCE_SCHEMA}",
+                "alias": "raw"
+            },
+            {
+                "name": "staging_organization",
+                "schema": "${DESTINATION_SCHEMA}",
+                "alias": "o",
+                "type": "LEFT",
+                "on": "o.organization_name = raw.project_pi_institution"
+            }
+        ],
+        "where": [
+            "o.organization_name IS NULL"
+        ]
+    }
+}

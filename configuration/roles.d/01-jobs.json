@@ -1,0 +1,107 @@
+{
+    "+roles": {
+        "+default": {
+            "+query_descripters": [{
+                    "realm": "Jobs",
+                    "group_by": "none"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobsize"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobwalltime"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobwaittime"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "pi"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource_type"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "person"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "pi_institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource_institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "username"
+                }
+            ]
+        },
+        "+pub": {
+            "+query_descripters": [{
+                    "realm": "Jobs",
+                    "group_by": "none"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobsize"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobwalltime"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "jobwaittime"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "pi"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource_type"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "person"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "pi_institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "resource_institution"
+                },
+                {
+                    "realm": "Jobs",
+                    "group_by": "username",
+                    "disable": true
+                }
+            ]
+        }
+    }
+}

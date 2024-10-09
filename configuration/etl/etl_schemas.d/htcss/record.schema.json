@@ -1,0 +1,77 @@
+{
+    "type": "object",
+    "description": "HTCSS Accounting Record",
+    "properties": {
+        "date": {
+            "type": "string"
+        },
+        "resource": {
+            "type": "string"
+        },
+        "project": {
+            "type": "string"
+        },
+        "system_account": {
+            "type": "string"
+        },
+        "job_wall_time_bucket": {
+            "type": "integer"
+        },
+        "job_wait_time_bucket": {
+            "type": "integer"
+        },
+        "aggregation_unit": {
+            "type": "string"
+        },
+        "processor_count": {
+            "type": "integer"
+        },
+        "gpu_count": {
+            "type": "integer"
+        },
+        "wallduration": {
+            "type": "integer"
+        },
+        "running_job_count": {
+            "type": "integer"
+        },
+        "waitduration": {
+            "type": "integer"
+        },
+        "submitted_job_count": {
+            "type": "integer"
+        },
+        "ended_job_count": {
+            "type": "integer",
+            "description": "Instance requested start time in RFC-3339 format (YYYY-MM-DDTHH:mm:ssZ)"
+        },
+        "started_job_count": {
+            "type": "integer"
+        },
+        "date": {
+            "type": "string",
+            "format": "full-date"
+        },
+        "resource_institution": {
+            "type": "string",
+            "description": "Account the instance was run under."
+        },
+        "field_of_science": {
+            "type": "string",
+            "description": "Node Controller the instance was run on."
+        },
+        "project_pi": {
+            "type": "string",
+            "description": "Image the instance was started from"
+        },
+        "project_pi_institution": {
+            "type": "string"
+        },
+        "person": {
+            "type": "string"
+        },
+        "person_institution": {
+            "type": "string"
+        }
+    }
+}

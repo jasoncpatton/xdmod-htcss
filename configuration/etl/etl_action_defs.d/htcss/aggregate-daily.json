@@ -1,0 +1,131 @@
+{
+    "table_definition": {
+        "$ref": "${table_definition_dir}/jobs/xdw/jobfact_by_day.json#/table_definition"
+    },
+    "aggregation_period_query": {
+        "overseer_restrictions": {
+            "last_modified_start_date": "start_date >= (SELECT MIN(start_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit_id = 1)",
+            "last_modified_end_date": "end_date <= (SELECT MAX(end_date) FROM modw_htcss.htcss_raw_logs where aggregation_unit_id = 1)"
+        }
+    },
+    "source_query": {
+        "query_hint": "SQL_NO_CACHE",
+        "records": {
+            "${AGGREGATION_UNIT}_id": "${:PERIOD_ID}",
+            "year": "${:YEAR_VALUE}",
+            "${AGGREGATION_UNIT}": "${:PERIOD_VALUE}",
+            "record_resource_id": "COALESCE(r.id, -1)",
+            "task_resource_id": "COALESCE(r.id, -1)",
+            "resource_organization_id": "COALESCE(resource_org.id, -1)",
+            "resourcetype_id": "-1",
+            "systemaccount_id": "COALESCE(sa.id, -1)",
+            "submission_venue_id": "-1",
+            "job_record_type_id": "-1",
+            "job_task_type_id": "-1",
+            "allocation_id": "-1",
+            "account_id": "-1",
+            "requesting_person_id": "p.id",
+            "person_id": "p.id",
+            "person_organization_id": "person_org.id",
+            "person_nsfstatuscode_id": "-1",
+            "fos_id": "COALESCE(fos.id, -1)",
+            "principalinvestigator_person_id": "COALESCE(person_pi.id, -1)",
+            "piperson_organization_id": "COALESCE(pi_org.id, 0)",
+            "job_time_bucket_id": "COALESCE(raw.job_wall_time_bucket, -1)",
+            "job_wait_time_bucket_id": "COALESCE(raw.job_wait_time_bucket, -1)",
+            "node_count": "0",
+            "processor_count": "raw.processor_count",
+            "processorbucket_id": "(SELECT id FROM ${UTILITY_SCHEMA}.processor_buckets pb WHERE raw.processor_count BETWEEN pb.min_processors AND pb.max_processors)",
+            "gpu_count": "raw.gpu_count",
+            "gpubucket_id": "(SELECT id FROM ${UTILITY_SCHEMA}.gpu_buckets gb WHERE raw.gpu_count BETWEEN gb.min_gpus AND gb.max_gpus)",
+            "qos_id": "-1",
+            "queue": "\"NA\"",
+            "submitted_job_count": "raw.submitted_job_count",
+            "ended_job_count": "raw.ended_job_count",
+            "started_job_count": "raw.started_job_count",
+            "running_job_count": "raw.running_job_count",
+            "wallduration": "raw.wallduration",
+            "sum_wallduration_squared": "COALESCE(CAST(POW(raw.wallduration, 2) AS DECIMAL(36,4)), 0)",
+            "waitduration": "raw.waitduration",
+            "sum_waitduration_squared": "COALESCE(CAST(POW(raw.waitduration, 2) AS DECIMAL(36,4)), 0)",
+            "local_charge_xdsu": "0",
+            "sum_local_charge_xdsu_squared": "0",
+            "cpu_time": "COALESCE(raw.processor_count * raw.wallduration, 0)",
+            "sum_cpu_time_squared": "COALESCE(CAST(POW(raw.processor_count * raw.wallduration, 2) AS DECIMAL(36,4)), 0)",
+            "gpu_time": "COALESCE(raw.gpu_count * raw.wallduration, 0)",
+            "sum_gpu_time_squared": "COALESCE(CAST(POW(raw.gpu_count * raw.wallduration, 2) AS DECIMAL(36,4)), 0)",
+            "node_time": "0",
+            "sum_node_time_squared": "0",
+            "sum_weighted_expansion_factor": "0",
+            "sum_job_weights": "0",
+            "job_id_list": "0"
+        },
+        "joins": [
+            {
+                "name": "htcss_raw_logs",
+                "schema": "${SOURCE_SCHEMA}",
+                "alias": "raw"
+            },
+            {
+                "name": "resourcefact",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "r",
+                "type": "LEFT",
+                "on": "raw.resource = r.code"
+            },
+            {
+                "name": "systemaccount",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "sa",
+                "type": "LEFT",
+                "on": "raw.system_account = sa.username AND r.id = sa.resource_id"
+            },
+            {
+                "name": "organization",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "resource_org",
+                "type": "LEFT",
+                "on": "raw.resource_institution = resource_org.name"
+            },
+            {
+                "name": "person",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "p",
+                "type": "LEFT",
+                "on": "raw.person_id = p.id"
+            },
+            {
+                "name": "organization",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "person_org",
+                "type": "LEFT",
+                "on": "raw.person_institution = person_org.name"
+            },
+            {
+                "name": "person",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "person_pi",
+                "type": "LEFT",
+                "on": "raw.project_pi_person_id = person_pi.id"
+            },
+            {
+                "name": "organization",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "pi_org",
+                "type": "LEFT",
+                "on": "raw.project_pi_institution = pi_org.name"
+            },
+            {
+                "name": "fieldofscience",
+                "schema": "${UTILITY_SCHEMA}",
+                "alias": "fos",
+                "type": "LEFT",
+                "on": "raw.project = fos.description"
+            }
+        ],
+        "where": [
+            "raw.aggregation_unit_id = 1",
+            "raw.start_day_id <= ${:PERIOD_END_DAY_ID} AND raw.end_day_id >= ${:PERIOD_START_DAY_ID}"
+        ]
+    }
+}
