@@ -952,7 +952,7 @@ def main():
     mapped_results = map_resources_and_projects(flatter_results)
 
     print(f"{datetime.now()} - Writing full JSON...")
-    write_json_file(list(mapped_results), Path(args.output_dir) / "ospool" / f"{period_start_str}_{period_end_str}{'.incomplete' if incomplete else ''}.json", indent=2)
+    write_json_file(list(mapped_results), Path(args.output_dir) / "ospool" / f"{args.period}_{period_start_str}_{period_end_str}{'.incomplete' if incomplete else ''}.json", indent=2)
     print(f"{datetime.now()} - Done!\n")
 
 
