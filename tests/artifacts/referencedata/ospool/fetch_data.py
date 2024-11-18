@@ -489,19 +489,19 @@ def print_error(d: dict, depth=0):
     pre = depth*"\t"
     for k, v in d.items():
         if k == "failed_shards" and len(v) > 0:
-            print(f"{pre}{k}:")
+            print(f"{datetime.now()} - {pre}{k}:")
             print_error(v[0], depth=depth+1)
-        elif k == "root_cause" and len(v) > 0:
-            print(f"{pre}{k}:")
+        elif k == "{datetime.now()} - root_cause" and len(v) > 0:
+            print(f"{datetime.now()} - {pre}{k}:")
             print_error(v[0], depth=depth+1)
         elif isinstance(v, dict):
-            print(f"{pre}{k}:")
+            print(f"{datetime.now()} - {pre}{k}:")
             print_error(v, depth=depth+1)
         elif isinstance(v, list):
             nt = f"\n{pre}\t"
-            print(f"{pre}{k}:\n{pre}\t{nt.join(v)}")
+            print(f"{datetime.now()} - {pre}{k}:\n{pre}\t{nt.join(v)}")
         else:
-            print(f"{pre}{k}:\t{v}")
+            print(f"{datetime.now()} - {pre}{k}:\t{v}")
 
 
 def get_keys_from_query(query: dict, keys=[]) -> List[str]:
@@ -867,14 +867,15 @@ def main():
                 waittime_buckets = [None]
                 if args.compute_buckets:
                     days_in_query = (period_end - start).days
-                    if days_in_query < 60:
+                    print(f"{datetime.now()} - Days in subquery from {start} to {period_end}: {days_in_query}")
+                    if days_in_query < 32:
                         pass
-                    elif days_in_query < 120:
+                    elif days_in_query < 64:
                         walltime_buckets = [(0, 4), (4, 9)]
-                    elif days_in_query < 240:
+                    elif days_in_query < 128:
                         walltime_buckets = [(0, 4), (4, 9)]
                         waittime_buckets = [(0, 4), (4, 9)]
-                    elif days_in_query < 480:
+                    elif days_in_query < 256:
                         walltime_buckets = [(0, 2), (2, 4), (4, 6), (6, 9)]
                         waittime_buckets = [(0, 4), (4, 9)]
                     else:
