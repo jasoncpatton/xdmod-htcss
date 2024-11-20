@@ -17,6 +17,7 @@ from os import fsync
 from typing import List, Dict, Set, Union
 
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import TransportError
 import htcondor
 
 
@@ -77,6 +78,29 @@ TOPOLOGY_PROJECT_DATA_URL = "https://topology.opensciencegrid.org/miscproject/xm
 TOPOLOGY_RESOURCE_DATA_URL = "https://topology.opensciencegrid.org/rgsummary/xml"
 
 VALID_PERIODS = ["day", "month", "quarter", "year"]
+
+QUERY_LEVELS = {
+    1: {
+        "walltime_buckets": [None],
+        "waittime_buckets": [None],
+    },
+    2: {
+        "walltime_buckets": [(0, 4), (4, 9)],
+        "waittime_buckets": [None],
+    },
+    3: {
+        "walltime_buckets": [(0, 3), (3, 5), (5, 9)],
+        "waittime_buckets": [None],
+    },
+    4: {
+        "walltime_buckets": [(0, 4), (4, 9)],
+        "waittime_buckets": [(0, 4), (4, 9)],
+    },
+    5: {
+        "walltime_buckets": [(0, 3), (3, 5), (5, 9)],
+        "waittime_buckets": [(0, 4), (4, 9)],
+    },
+}
 
 
 def valid_date(date_str: str) -> datetime:
@@ -491,7 +515,7 @@ def print_error(d: dict, depth=0):
         if k == "failed_shards" and len(v) > 0:
             print(f"{datetime.now()} - {pre}{k}:")
             print_error(v[0], depth=depth+1)
-        elif k == "{datetime.now()} - root_cause" and len(v) > 0:
+        elif k == "root_cause" and len(v) > 0:
             print(f"{datetime.now()} - {pre}{k}:")
             print_error(v[0], depth=depth+1)
         elif isinstance(v, dict):
@@ -647,6 +671,7 @@ def main():
     }
 
     total_days = (period_end - period_start).days
+    last_query_level = None
     timeout = int(60 * total_days**0.35)
     client = Elasticsearch(timeout=timeout)
 
@@ -862,74 +887,79 @@ def main():
                     }
                     this_query_params["extra_mappings"] = extra_mappings
 
-                # Split up queries to reduce number of buckets
-                walltime_buckets = [None]
-                waittime_buckets = [None]
-                if args.compute_buckets:
-                    days_in_query = (period_end - start).days
-                    print(f"{datetime.now()} - Days in subquery from {start} to {period_end}: {days_in_query}")
-                    if days_in_query < 32:
-                        pass
-                    elif days_in_query < 64:
-                        walltime_buckets = [(0, 4), (4, 9)]
-                    elif days_in_query < 128:
-                        walltime_buckets = [(0, 4), (4, 9)]
-                        waittime_buckets = [(0, 4), (4, 9)]
-                    elif days_in_query < 256:
-                        walltime_buckets = [(0, 2), (2, 4), (4, 6), (6, 9)]
-                        waittime_buckets = [(0, 4), (4, 9)]
-                    else:
-                        walltime_buckets = [(0, 2), (2, 4), (4, 6), (6, 9)]
-                        waittime_buckets = [(0, 2), (2, 4), (4, 6), (6, 9)]
+                days_in_query = (period_end - start).days
+                print(f"{datetime.now()} - Days in query from {start} to {period_end}: {days_in_query}")
 
-                i_reduced_query = 0
-                n_reduced_query = len(walltime_buckets) * len(waittime_buckets)
-                for walltime_bucket in walltime_buckets:
-                    for waittime_bucket in waittime_buckets:
-                        i_reduced_query += 1
+                query_level = last_query_level
+                if query_level is None:
+                    query_level = 1
+                    if args.compute_buckets:
+                        query_level = min(max(int(math.log(days_in_query, 2.1)) - 3, 1), 5)
 
-                        reduced_query_filters = []
-                        if walltime_bucket is not None:
-                            reduced_query_filters.append(
-                                {"terms": {
-                                    "JobWallTimeBucket": list(range(*walltime_bucket)),
-                                }}
-                            )
-                        if waittime_bucket is not None:
-                            reduced_query_filters.append(
-                                {"terms": {
-                                    "JobWaitTimeBucket": list(range(*waittime_bucket)),
-                                }}
-                            )
+                while query_level <= 5:
+                    try:
 
-                        this_query_params["extra_filters"] = extra_filters + reduced_query_filters
-                        query = get_query(
-                            index=OSPOOL_ES_INDEX,
-                            period_start_ts=start_ts,
-                            period_end_ts=period_end_ts,
-                            compute_buckets=args.compute_buckets,
-                            **this_query_params,
-                            )
+                        # Split up queries to reduce number of buckets
+                        if args.compute_buckets:
+                            walltime_buckets = QUERY_LEVELS[query_level]["walltime_buckets"]
+                            waittime_buckets = QUERY_LEVELS[query_level]["waittime_buckets"]
+                            print(f"{datetime.now()} - At query level {query_level} ({len(walltime_buckets)*len(waittime_buckets)} subqueries per query)")
 
-                        print(f"{datetime.now()} - Running {query_name} ({i_query+1} of {len(queries)}) - {i_date+1} of {len(date_ranges)} date ranges - {i_reduced_query} of {n_reduced_query} subqueries...")
-                        t0 = time.time()
-                        try:
-                            result = client.search(index=query.pop("index"), body=query)
-                        except Exception as err:
-                            try:
-                                print_error(err.info)
-                            except Exception:
-                                pass
-                            raise err
-                        print(f"{datetime.now()} - ...took {time.time() - t0:0.2f} seconds")
+                        i_reduced_query = 0
+                        n_reduced_query = len(walltime_buckets) * len(waittime_buckets)
+                        for walltime_bucket in walltime_buckets:
+                            for waittime_bucket in waittime_buckets:
+                                i_reduced_query += 1
 
-                        keylist = list(initial_key.keys()) + get_keys_from_query(query)
-                        this_flat_result = flatten_aggs(
-                            agg=result["aggregations"],
-                            ordered_keys=keylist,
-                            this_row_key=initial_key.copy(),
-                        )
-                        flat_results = merge_flattened_aggs(flat_results, this_flat_result)
+                                reduced_query_filters = []
+                                if walltime_bucket is not None:
+                                    reduced_query_filters.append(
+                                        {"terms": {
+                                            "JobWallTimeBucket": list(range(*walltime_bucket)),
+                                        }}
+                                    )
+                                if waittime_bucket is not None:
+                                    reduced_query_filters.append(
+                                        {"terms": {
+                                            "JobWaitTimeBucket": list(range(*waittime_bucket)),
+                                        }}
+                                    )
+
+                                this_query_params["extra_filters"] = extra_filters + reduced_query_filters
+                                query = get_query(
+                                    index=OSPOOL_ES_INDEX,
+                                    period_start_ts=start_ts,
+                                    period_end_ts=period_end_ts,
+                                    compute_buckets=args.compute_buckets,
+                                    **this_query_params,
+                                    )
+
+                                print(f"{datetime.now()} - Running {query_name} ({i_query+1} of {len(queries)}) - {i_date+1} of {len(date_ranges)} date ranges - {i_reduced_query} of {n_reduced_query} subqueries...")
+                                t0 = time.time()
+                                result = client.search(index=query.pop("index"), body=query)
+                                print(f"{datetime.now()} - ...took {time.time() - t0:0.2f} seconds")
+
+                                keylist = list(initial_key.keys()) + get_keys_from_query(query)
+                                this_flat_result = flatten_aggs(
+                                    agg=result["aggregations"],
+                                    ordered_keys=keylist,
+                                    this_row_key=initial_key.copy(),
+                                )
+                                flat_results = merge_flattened_aggs(flat_results, this_flat_result)
+
+                    # retry on too many buckets and split up the query
+                    except TransportError as err:
+                        err_type = err.info.get("error", {}).get("caused_by", {}).get("type")
+                        if err_type == "too_many_buckets_exception" and args.compute_buckets and query_level < 5:
+                            query_level += 1
+                            print(f"{datetime.now()} - ...got too_many_buckets_exception after {time.time() - t0:0.2f} seconds, retrying at query level {query_level}...")
+                            continue
+                        print_error(err.info)
+                        raise err
+
+                    last_query_level = query_level
+                    break
+
 
     except KeyboardInterrupt:
         print(f"{datetime.now()} - Exiting early due to Ctrl-C...")
