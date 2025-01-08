@@ -7,7 +7,7 @@ import pickle
 import math
 from pprint import pprint
 from collections import deque
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import xml.etree.ElementTree as ET
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -117,6 +117,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lookback", type=int, default=28, help="Minimum number of days to look back (default: %(default)s)")
     parser.add_argument("--output-dir", type=Path, help="Directory to store JSON output", required=True)
     parser.add_argument("--compute-buckets", action="store_true", help="Compute waittime and walltime buckets")
+    parser.add_argument("--utc", action="store_true", help="Use midnight UTC for date boundaries")
     args = parser.parse_args()
     return args
 
@@ -643,6 +644,8 @@ def main():
     args = parse_args()
     print(f"\n{datetime.now()} - Starting up with arguments:")
     pprint(vars(args))
+    if args.utc:
+        args.end = args.end.replace(tzinfo=timezone.utc)
 
     period_end = args.end
     period_end_ts = int(period_end.timestamp())
