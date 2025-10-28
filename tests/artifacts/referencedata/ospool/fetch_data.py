@@ -100,6 +100,18 @@ QUERY_LEVELS = {
         "walltime_buckets": [(0, 3), (3, 5), (5, 9)],
         "waittime_buckets": [(0, 4), (4, 9)],
     },
+    6: {
+        "walltime_buckets": [(0, 3), (3, 5), (5, 9)],
+        "waittime_buckets": [(0, 3), (3, 5), (5, 9)],
+    },
+    7: {
+        "walltime_buckets": [(0, 2), (2, 3), (3, 4), (4, 9)],
+        "waittime_buckets": [(0, 3), (3, 5), (5, 9)],
+    },
+    8: {
+        "walltime_buckets": [(0, 2), (2, 3), (3, 4), (4, 9)],
+        "waittime_buckets": [(0, 3), (3, 4), (4, 6), (6, 9)],
+    },
 }
 
 
@@ -675,7 +687,7 @@ def main():
 
     total_days = (period_end - period_start).days
     last_query_level = None
-    timeout = int(60 * total_days**0.35)
+    timeout = round(60 * total_days**0.39)
     client = Elasticsearch(timeout=timeout)
 
     queries = {
@@ -897,9 +909,14 @@ def main():
                 if query_level is None:
                     query_level = 1
                     if args.compute_buckets:
-                        query_level = min(max(int(math.log(days_in_query, 2.1)) - 3, 1), 5)
+                        query_level = min(max(round(0.023 * days_in_query + 1), 1), len(QUERY_LEVELS))
 
-                while query_level <= 5:
+                request_kwargs = {"request_timeout": timeout}
+                tries = 0
+                max_tries = 5
+
+                while query_level <= len(QUERY_LEVELS) and tries < max_tries:
+                    tries += 1
                     try:
 
                         # Split up queries to reduce number of buckets
@@ -939,7 +956,7 @@ def main():
 
                                 print(f"{datetime.now()} - Running {query_name} ({i_query+1} of {len(queries)}) - {i_date+1} of {len(date_ranges)} date ranges - {i_reduced_query} of {n_reduced_query} subqueries...")
                                 t0 = time.time()
-                                result = client.search(index=query.pop("index"), body=query)
+                                result = client.search(index=query.pop("index"), body=query, **request_kwargs)
                                 print(f"{datetime.now()} - ...took {time.time() - t0:0.2f} seconds")
 
                                 keylist = list(initial_key.keys()) + get_keys_from_query(query)
@@ -953,11 +970,19 @@ def main():
                     # retry on too many buckets and split up the query
                     except TransportError as err:
                         err_type = err.info.get("error", {}).get("caused_by", {}).get("type")
-                        if err_type == "too_many_buckets_exception" and args.compute_buckets and query_level < 5:
+                        if err_type == "too_many_buckets_exception" and args.compute_buckets and query_level < len(QUERY_LEVELS):
                             query_level += 1
                             print(f"{datetime.now()} - ...got too_many_buckets_exception after {time.time() - t0:0.2f} seconds, retrying at query level {query_level}...")
                             continue
                         print_error(err.info)
+                        raise err
+
+                    # retry on timeout
+                    except TimeoutError:
+                        request_kwargs["request_timeout"] = 1.5 * request_kwargs["request_timeout"]
+                        print(f"{datetime.now()} - ...request timed out after {time.time() - t0:0.2f} seconds, retrying {max_tries - tries} more times")
+                        if tries >= max_tries:
+                            continue
                         raise err
 
                     last_query_level = query_level
